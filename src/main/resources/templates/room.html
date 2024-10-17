@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Room</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h1>Welcome, <span id="playerName" th:text="${playerName}"></span> to Room <span id="roomCode" th:text="${roomCode}"></span></h1>
+
+<div id="messages"></div>
+
+<form id="messageForm">
+    <input type="text" id="messageInput" placeholder="Enter your message">
+    <button type="submit">Send</button>
+</form>
+
+<script>
+    var stompClient = null;
+    var roomCode = document.getElementById("roomCode").textContent; // Lấy roomCode từ HTML
+
+    function connect() {
+        var socket = new SockJS('/caro-game');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+
+            // Subscribe vào topic của phòng với roomCode
+            stompClient.subscribe('/topic/room/' + roomCode, function (messageOutput) {
+                showMessage(JSON.parse(messageOutput.body));
+            });
+        });
+    }
+
+
+    function sendMessage() {
+        var messageContent = document.getElementById("messageInput").value;
+        var playerName = document.getElementById("playerName").textContent;
+        if (messageContent && stompClient) {
+            var message = {
+                playerName: playerName,
+                content: messageContent
+            };
+            // Gửi tin nhắn đến phòng cụ thể
+            stompClient.send("/app/sendMessage/" + roomCode, {}, JSON.stringify(message));
+        }
+    }
+
+
+    function showMessage(message) {
+        var messages = document.getElementById("messages");
+        var messageElement = document.createElement('div');
+        messageElement.innerHTML = `<strong>${message.playerName}</strong>: ${message.content}`;
+        messages.appendChild(messageElement);
+    }
+
+    document.getElementById('messageForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        sendMessage();
+        document.getElementById("messageInput").value = '';
+    });
+
+    connect();
+</script>
+</body>
+</html>

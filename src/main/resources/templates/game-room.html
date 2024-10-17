@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Room</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Room</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/game.js" defer></script>
+</head>
+<body>
+<h1>Welcome, <span id="playerName" th:text="${playerName}"></span> to Room <span id="roomCode" th:text="${roomCode}"></span> symbol: <span id="playerSymbol" th:text="${playerSymbol}"></span></h1>
+<h2><span id="gameStatus"></span></h2>
+<div id="playerTurn"></div>
+<div class="board">
+    <!-- Tạo bàn cờ 16x16 -->
+</div>
+<script th:inline="javascript">
+        var gameBoard = [[${gameBoard}]];
+        var isPlayerTurn = [[${playerTurn}]];
+        var isGameStarted = [[${isGameStarted}]];
+
+</script> <!-- Link tới file JavaScript chứa logic -->
+</body>
+</html>
